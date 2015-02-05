@@ -16,10 +16,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var soundEffect : SKAction!
     let sparks = SKEmitterNode(fileNamed: "fire")
     let scrollNode = SKNode()
+    let groundNode = SKNode()
+    let bottomBoundary = SKNode()
     let bk1 = SKSpriteNode(imageNamed: "angry_background")
     let bk2 = SKSpriteNode(imageNamed: "angry_background")
     let block = SKSpriteNode(imageNamed: "block_trans")
     var blocks : [SKSpriteNode] = []
+    
+    
     let fabyMask : UInt32 = 0x00
     let wallMask : UInt32 = 0x01
     let blockMask : UInt32 = 0x02
@@ -27,15 +31,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func didMoveToView(view: SKView) {
         setupScreen(view)
-        setTitle()
+        setTitle("Tap to begin!")
         setupPhysics()
         setupBackground()
     }
     
     func setupPhysics() {
         physicsWorld.contactDelegate = self
-        let ground_distance : CGFloat = -10.0
-        self.physicsBody = SKPhysicsBody(edgeLoopFromRect: CGRectMake(0, ground_distance, self.size.width, self.size.height - ground_distance))
+        
+        let height = frame.height / 40.0
+        bottomBoundary.position = CGPointMake(0.0, height)
+        bottomBoundary.physicsBody = SKPhysicsBody(rectangleOfSize: CGSizeMake(self.frame.size.width, height * 2.0))
+        bottomBoundary.physicsBody?.dynamic = false
+        bottomBoundary.physicsBody?.categoryBitMask = wallMask
+        
+        self.addChild(bottomBoundary)
     }
     
     func setupScreen(view:SKView) {
@@ -44,19 +54,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func setupBackground() {
-        
-        
         bk1.anchorPoint = CGPointZero
         bk1.position = CGPointMake(0, 0)
         bk1.zPosition = -15
-        scrollNode.addChild(bk1)
-//        self.addChild(bk1)
+        groundNode.addChild(bk1)
         
         bk2.anchorPoint = CGPointZero
         bk2.position = CGPointMake(bk1.size.width - 1, 0)
         bk2.zPosition = -15
-        scrollNode.addChild(bk2)
-//        self.addChild(bk2)
+        groundNode.addChild(bk2)
+        
+        scrollNode.addChild(groundNode)
         
         self.addChild(scrollNode)
         backgroundImageHandler()
@@ -70,15 +78,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func backgroundImageHandler() {
-        bk1.position = CGPointMake(bk1.position.x - 2, bk1.position.y)
-        bk2.position = CGPointMake(bk2.position.x - 2, bk2.position.y)
-        
-        if(bk1.position.x < -bk1.size.width){
-            bk1.position = CGPointMake(bk2.position.x + bk2.size.width, bk1.position.y)
-        }
-        
-        if(bk2.position.x < -bk2.size.width) {
-            bk2.position = CGPointMake(bk1.position.x + bk1.size.width, bk2.position.y)
+        if gameStatus == "playing" {
+            bk1.position = CGPointMake(bk1.position.x - 2, bk1.position.y)
+            bk2.position = CGPointMake(bk2.position.x - 2, bk2.position.y)
+            
+            if(bk1.position.x < -bk1.size.width){
+                bk1.position = CGPointMake(bk2.position.x + bk2.size.width, bk1.position.y)
+            }
+            
+            if(bk2.position.x < -bk2.size.width) {
+                bk2.position = CGPointMake(bk1.position.x + bk1.size.width, bk2.position.y)
+            }
         }
     }
     
@@ -114,63 +124,76 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             self.physicsWorld.gravity =  CGVector(dx: 0, dy: -15)
             self.addChild(faby)
         } else if(gameStatus == "playing") {
-            //give upwards impulse
-            faby.physicsBody?.velocity = CGVector(dx: 0, dy: 600)
-            
-            //add sound
-            runAction(soundEffect)
-            
-            //add animation
-            let addSparks = createSparks()
-            runAction(addSparks)
-            let timer = NSTimer.scheduledTimerWithTimeInterval(0.25, target: self, selector: Selector("killSparks"), userInfo: nil, repeats: false)
-            
-            
-            //add blocks
-            let addBlocks = createBlock()
-            runAction(addBlocks)
-            
+            if scrollNode.speed > 0 {
+                
+                //give upwards impulse
+                faby.physicsBody?.velocity = CGVector(dx: 0, dy: 600)
+                
+                //add sound
+                runAction(soundEffect)
+                
+                //add animation
+                let addSparks = createSparks()
+                runAction(addSparks)
+                let timer = NSTimer.scheduledTimerWithTimeInterval(0.25, target: self, selector: Selector("killSparks"), userInfo: nil, repeats: false)
+                
+                //add blocks
+                let addBlocks = createBlock()
+                runAction(addBlocks)
+            }
         }
     }
     
     func createSparks() -> SKAction {
-        return SKAction.sequence([SKAction.runBlock {
-            self.sparks.removeFromParent()
-            self.sparks.position = CGPoint(x: self.faby.position.x - 10, y: self.faby.position.y + 20)
-            self.sparks.zPosition = 10
-            self.addChild(self.sparks)
-            }
+        return SKAction.sequence(
+            [
+                SKAction.runBlock {
+                    self.sparks.removeFromParent()
+                    self.sparks.position = CGPoint(x: self.faby.position.x - 10, y: self.faby.position.y + 20)
+                    self.sparks.zPosition = 10
+                    self.addChild(self.sparks)
+                }
             ]
         )
     }
     
     func createBlock() -> SKAction {
         return SKAction.sequence(
-            [SKAction.runBlock {
-                let aBlock = SKSpriteNode(imageNamed: "block_trans")
-                aBlock.xScale = 0.5
-                aBlock.yScale = 0.5
-                let yPos = Float(CGRectGetMaxY(self.frame)) * self.getRandomHeight()
-                aBlock.position = CGPoint(x: CGRectGetMaxX(self.frame) - 10, y: CGFloat(yPos))
-                
-                let blockPhysicsBody = SKPhysicsBody(circleOfRadius: aBlock.size.width)
-                blockPhysicsBody.affectedByGravity = false
-                blockPhysicsBody.linearDamping = 1
-                //                blockPhysicsBody.contactTestBitMask = 0x03
-                //blockPhysicsBody.velocity = CGVector(dx: -800, dy: 0)
-                blockPhysicsBody.allowsRotation = false
-                aBlock.physicsBody = blockPhysicsBody
-                
-                let movementDistance : CGFloat = CGFloat(100.0)
-                let moveBlock = SKAction.moveByX(-movementDistance, y: 0, duration: NSTimeInterval(0.01 * movementDistance))
-                
-                
-                
-                self.blocks.append(aBlock)
-                self.scrollNode.addChild(aBlock)
+            [
+                SKAction.runBlock {
+                    let aBlock = SKSpriteNode(imageNamed: "block_trans")
+                    let scaleFactor = self.getRandomScale()
+                    aBlock.xScale = scaleFactor
+                    aBlock.yScale = scaleFactor
+                    let yPos = Float(CGRectGetMaxY(self.frame)) * self.getRandomHeight()
+                    aBlock.position = CGPoint(x: CGRectGetMaxX(self.frame) - 10, y: CGFloat(yPos))
+                    
+                    let blockPhysicsBody = SKPhysicsBody(circleOfRadius: aBlock.size.width)
+                    blockPhysicsBody.affectedByGravity = false
+                    blockPhysicsBody.linearDamping = 1
+                    
+                    blockPhysicsBody.categoryBitMask = self.blockMask
+                    blockPhysicsBody.contactTestBitMask = self.fabyMask
+                    blockPhysicsBody.dynamic = false
+                    blockPhysicsBody.allowsRotation = false
+                    aBlock.physicsBody = blockPhysicsBody
+                    
+                    let movementDistance : CGFloat = CGFloat(1000.0)
+                    let moveBlock = SKAction.moveByX(-movementDistance, y: 0, duration: NSTimeInterval(0.005 * movementDistance))
+                    aBlock.runAction(moveBlock)
+                    
+                    
+                    self.blocks.append(aBlock)
+                    self.scrollNode.addChild(aBlock)
                 }
             ]
         )
+    }
+    
+    func getRandomScale() -> CGFloat {
+        let val : Double = Double(arc4random_uniform(5) + 2)
+        println(val)
+        return CGFloat(val / 10.0)
     }
     
     func getRandomHeight() -> Float {
@@ -185,10 +208,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func didBeginContact(contact: SKPhysicsContact) {
         faby.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
         sparks.removeFromParent()
+        
+        if scrollNode.speed > 0 {
+            gameStatus = "lost"
+            scrollNode.speed = 0
+            for block in blocks {
+                block.removeFromParent()
+            }
+            setTitle("Game Over!")
+        }
     }
     
-    func setTitle() {
-        startTitle.text = "Tap to begin!"
+    func setTitle(str : String) {
+        startTitle.text = str
         startTitle.fontColor = UIColor.whiteColor()
         startTitle.fontSize = 35
         startTitle.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))

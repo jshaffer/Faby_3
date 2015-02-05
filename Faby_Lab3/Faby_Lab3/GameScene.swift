@@ -120,6 +120,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
             //setup audio
             soundEffect = SKAction.playSoundFileNamed("bird-chirp.mp3", waitForCompletion: false)
+            setupBlocks()
+            
             
             self.physicsWorld.gravity =  CGVector(dx: 0, dy: -15)
             self.addChild(faby)
@@ -137,11 +139,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 runAction(addSparks)
                 let timer = NSTimer.scheduledTimerWithTimeInterval(0.25, target: self, selector: Selector("killSparks"), userInfo: nil, repeats: false)
                 
-                //add blocks
-                let addBlocks = createBlock()
-                runAction(addBlocks)
+                
             }
         }
+    }
+    
+    func setupBlocks() {
+        //add blocks
+        let addBlocks = createBlock()
+        let delay = SKAction.waitForDuration(0.75, withRange: 0.1)
+        let seq = SKAction.sequence([addBlocks, delay])
+        let addBlocksForever = SKAction.repeatActionForever(seq)
+
+        runAction(addBlocksForever)
     }
     
     func createSparks() -> SKAction {

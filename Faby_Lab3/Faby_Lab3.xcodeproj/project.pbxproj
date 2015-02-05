@@ -15,9 +15,9 @@
 		89E271D11A80757400F3D92D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 89E271D01A80757400F3D92D /* Images.xcassets */; };
 		89E271D41A80757400F3D92D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 89E271D21A80757400F3D92D /* LaunchScreen.xib */; };
 		89E271E01A80757400F3D92D /* Faby_Lab3Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89E271DF1A80757400F3D92D /* Faby_Lab3Tests.swift */; };
-		89E271EC1A80761500F3D92D /* fire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 89E271EB1A80761500F3D92D /* fire.sks */; };
-		89E271EE1A80764400F3D92D /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 89E271ED1A80764400F3D92D /* spark.png */; };
-		9593C95E1A83271A00419FED /* bird-chirp.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9593C95D1A83271A00419FED /* bird-chirp.mp3 */; };
+		9533AFF81A832AC9009FA303 /* bird-chirp.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9533AFF71A832AC9009FA303 /* bird-chirp.mp3 */; };
+		9533AFFA1A832ADF009FA303 /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 9533AFF91A832ADF009FA303 /* spark.png */; };
+		9533AFFC1A832AE9009FA303 /* fire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 9533AFFB1A832AE9009FA303 /* fire.sks */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,9 +43,9 @@
 		89E271D91A80757400F3D92D /* Faby_Lab3Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Faby_Lab3Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		89E271DE1A80757400F3D92D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		89E271DF1A80757400F3D92D /* Faby_Lab3Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Faby_Lab3Tests.swift; sourceTree = "<group>"; };
-		89E271EB1A80761500F3D92D /* fire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; name = fire.sks; path = "../../../../../Volumes/USB DISK/CPE458/Lab2/Lab2/Lab2/fire.sks"; sourceTree = "<group>"; };
-		89E271ED1A80764400F3D92D /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = spark.png; path = "../../../../../Volumes/USB DISK/CPE458/Lab2/Lab2/Lab2/spark.png"; sourceTree = "<group>"; };
-		9593C95D1A83271A00419FED /* bird-chirp.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "bird-chirp.mp3"; path = "../../../Downloads/bird-chirp.mp3"; sourceTree = "<group>"; };
+		9533AFF71A832AC9009FA303 /* bird-chirp.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "bird-chirp.mp3"; sourceTree = "<group>"; };
+		9533AFF91A832ADF009FA303 /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
+		9533AFFB1A832AE9009FA303 /* fire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = fire.sks; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,11 +87,11 @@
 		89E271C21A80757400F3D92D /* Faby_Lab3 */ = {
 			isa = PBXGroup;
 			children = (
-				89E271ED1A80764400F3D92D /* spark.png */,
-				89E271EB1A80761500F3D92D /* fire.sks */,
+				9533AFF71A832AC9009FA303 /* bird-chirp.mp3 */,
 				89E271C51A80757400F3D92D /* AppDelegate.swift */,
 				89E271C71A80757400F3D92D /* GameScene.sks */,
-				9593C95D1A83271A00419FED /* bird-chirp.mp3 */,
+				9533AFF91A832ADF009FA303 /* spark.png */,
+				9533AFFB1A832AE9009FA303 /* fire.sks */,
 				89E271C91A80757400F3D92D /* GameScene.swift */,
 				89E271CB1A80757400F3D92D /* GameViewController.swift */,
 				89E271CD1A80757400F3D92D /* Main.storyboard */,
@@ -208,13 +208,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9593C95E1A83271A00419FED /* bird-chirp.mp3 in Resources */,
+				9533AFF81A832AC9009FA303 /* bird-chirp.mp3 in Resources */,
 				89E271D41A80757400F3D92D /* LaunchScreen.xib in Resources */,
 				89E271D11A80757400F3D92D /* Images.xcassets in Resources */,
 				89E271C81A80757400F3D92D /* GameScene.sks in Resources */,
-				89E271EE1A80764400F3D92D /* spark.png in Resources */,
+				9533AFFA1A832ADF009FA303 /* spark.png in Resources */,
+				9533AFFC1A832AE9009FA303 /* fire.sks in Resources */,
 				89E271CF1A80757400F3D92D /* Main.storyboard in Resources */,
-				89E271EC1A80761500F3D92D /* fire.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -151,7 +151,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let seq = SKAction.sequence([addBlocks, delay])
         let addBlocksForever = SKAction.repeatActionForever(seq)
 
-        runAction(addBlocksForever)
+        runAction(addBlocksForever, withKey: "addBlocksForever")
     }
     
     func createSparks() -> SKAction {
@@ -220,6 +220,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sparks.removeFromParent()
         
         if scrollNode.speed > 0 {
+            self.removeActionForKey("addBlocksForever")
             gameStatus = "lost"
             scrollNode.speed = 0
             for block in blocks {

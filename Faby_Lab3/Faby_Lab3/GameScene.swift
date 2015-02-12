@@ -143,8 +143,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 let addSparks = createSparks()
                 runAction(addSparks)
                 let timer = NSTimer.scheduledTimerWithTimeInterval(0.25, target: self, selector: Selector("killSparks"), userInfo: nil, repeats: false)
-                
-                
             }
         }
     }
@@ -236,7 +234,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func getRandomScale() -> CGFloat {
         let val : Double = Double(arc4random_uniform(5) + 2)
-        println(val)
         return CGFloat(val / 10.0)
     }
     
@@ -249,12 +246,73 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sparks.removeFromParent()
     }
     
-    
     func setTitle(str : String) {
         startTitle.text = str
         startTitle.fontColor = UIColor.whiteColor()
         startTitle.fontSize = 35
         startTitle.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
         self.addChild(startTitle)
+    }
+}
+
+//***The below code was adapted from a tutorial available here:***
+//http://www.thinkingswiftly.com/saving-spritekit-game-data-swift-easy-nscoder/
+
+var theHighScoreManager = HighScoreManager()
+
+class HighScore: NSObject, NSCoding {
+    let storedScore:Int
+    
+    init(score:Int) {
+        self.storedScore = score
+    }
+    
+    required init(coder: NSCoder) {
+        self.storedScore = coder.decodeObjectForKey("storedScore")! as Int
+        super.init()
+    }
+    
+    func encodeWithCoder(coder: NSCoder) {
+        coder.encodeObject(self.storedScore, forKey: "storedScore")
+    }
+}
+
+class HighScoreManager {
+    var aScore:HighScore
+    
+    init() {
+        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
+        let documentsDirectory = paths[0] as String
+        let path = documentsDirectory.stringByAppendingPathComponent("HighScores.plist")
+        let fileManager = NSFileManager.defaultManager()
+        
+        // check if file exists
+        if !fileManager.fileExistsAtPath(path) {
+            if let bundle = NSBundle.mainBundle().pathForResource("DefaultFile", ofType: "plist") {
+                fileManager.copyItemAtPath(bundle, toPath: path, error:nil)
+            }
+        }
+        
+        if let rawData = NSData(contentsOfFile: path) {
+            var readInScore: AnyObject? = NSKeyedUnarchiver.unarchiveObjectWithData(rawData)
+            self.aScore = readInScore as HighScore
+        } else {
+            self.aScore = HighScore(score: 0)
+        }
+    }
+    
+    func save() {
+        let saveData = NSKeyedArchiver.archivedDataWithRootObject(self.aScore)
+        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true) as NSArray
+        let documentsDirectory = paths.objectAtIndex(0) as NSString
+        let path = documentsDirectory.stringByAppendingPathComponent("HighScores.plist")
+        
+        saveData.writeToFile(path, atomically: true)
+    }
+
+    func addNewScore(newScore:Int) {
+        let newHighScore = HighScore(score: newScore)
+        self.aScore = newHighScore
+        self.save()
     }
 }

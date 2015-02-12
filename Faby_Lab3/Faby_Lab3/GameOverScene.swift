@@ -11,9 +11,6 @@ import SpriteKit
 
 class GameOverScene: SKScene {
     
-    
-    
-    
     override func didMoveToView(view: SKView) {
         setTitle()
         setScores()
@@ -34,6 +31,12 @@ class GameOverScene: SKScene {
         
         if currentScore > highScore {
             highScore = currentScore
+        }
+        
+        if highScore > theHighScoreManager.aScore.storedScore {
+            theHighScoreManager.addNewScore(highScore)
+        } else {
+            highScore = theHighScoreManager.aScore.storedScore
         }
         
         highScoreNode.text = "High Score: \(highScore)"
@@ -67,6 +70,4 @@ class GameOverScene: SKScene {
         startTitle.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
         self.addChild(startTitle)
     }
-    
-    
 }

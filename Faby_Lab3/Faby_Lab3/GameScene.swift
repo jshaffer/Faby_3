@@ -278,7 +278,7 @@ class HighScore: NSObject, NSCoding {
 }
 
 class HighScoreManager {
-    var aScore:HighScore
+    var scores:Array<HighScore> = [];
     
     init() {
         let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)
@@ -286,7 +286,6 @@ class HighScoreManager {
         let path = documentsDirectory.stringByAppendingPathComponent("HighScores.plist")
         let fileManager = NSFileManager.defaultManager()
         
-        // check if file exists
         if !fileManager.fileExistsAtPath(path) {
             if let bundle = NSBundle.mainBundle().pathForResource("DefaultFile", ofType: "plist") {
                 fileManager.copyItemAtPath(bundle, toPath: path, error:nil)
@@ -294,25 +293,51 @@ class HighScoreManager {
         }
         
         if let rawData = NSData(contentsOfFile: path) {
-            var readInScore: AnyObject? = NSKeyedUnarchiver.unarchiveObjectWithData(rawData)
-            self.aScore = readInScore as HighScore
-        } else {
-            self.aScore = HighScore(score: 0)
+            var scoreArray: AnyObject? = NSKeyedUnarchiver.unarchiveObjectWithData(rawData);
+            self.scores = scoreArray as? [HighScore] ?? [];
+            
+            for var i = 0; i < 5; i++ {
+                self.scores.append(HighScore(score: 0))
+            }
         }
     }
     
     func save() {
-        let saveData = NSKeyedArchiver.archivedDataWithRootObject(self.aScore)
-        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true) as NSArray
-        let documentsDirectory = paths.objectAtIndex(0) as NSString
-        let path = documentsDirectory.stringByAppendingPathComponent("HighScores.plist")
+        let saveData = NSKeyedArchiver.archivedDataWithRootObject(self.scores);
+        let paths = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true) as NSArray;
+        let documentsDirectory = paths.objectAtIndex(0) as NSString;
+        let path = documentsDirectory.stringByAppendingPathComponent("HighScores.plist");
         
-        saveData.writeToFile(path, atomically: true)
+        saveData.writeToFile(path, atomically: true);
     }
-
+    
     func addNewScore(newScore:Int) {
-        let newHighScore = HighScore(score: newScore)
-        self.aScore = newHighScore
-        self.save()
+        let newHighScore = HighScore(score: newScore);
+        var done = false
+        for var i = 0; i < scores.count && !done; i++ {
+            if newScore > scores[i].storedScore {
+                self.scores.insert(newHighScore, atIndex: i)
+                self.scores.removeLast()
+                done = true
+            }
+        }
+        
+        //clearScores is only implemented for testing purposes, and allows me to clear all the scores
+        //clearScores();
+        
+        self.save();
+    }
+    
+    func clearScores() {
+        scores.removeAll(keepCapacity: false)
+        for var i = 0; i < 5; i++ {
+            scores.append(HighScore(score: 0))
+        }
     }
 }
+
+
+
+
+
+

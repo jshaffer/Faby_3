@@ -33,13 +33,13 @@ class GameOverScene: SKScene {
             highScore = currentScore
         }
         
-        if highScore > theHighScoreManager.aScore.storedScore {
-            theHighScoreManager.addNewScore(highScore)
-        } else {
-            highScore = theHighScoreManager.aScore.storedScore
+        if highScore > theHighScoreManager.scores[4].storedScore {
+            theHighScoreManager.addNewScore(currentScore)
         }
+        highScore = theHighScoreManager.scores[0].storedScore
+        var scoreArray = theHighScoreManager.scores
         
-        highScoreNode.text = "High Score: \(highScore)"
+        highScoreNode.text = "High Scores: \(scoreArray[0].storedScore), \(scoreArray[1].storedScore), \(scoreArray[2].storedScore), \(scoreArray[3].storedScore), \(scoreArray[4].storedScore)"
         highScoreNode.fontColor = UIColor.whiteColor()
         highScoreNode.fontSize = 35
         highScoreNode.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame) - 40)

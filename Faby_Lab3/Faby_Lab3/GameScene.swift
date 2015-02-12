@@ -9,6 +9,9 @@
 import SpriteKit
 import Darwin
 
+var highScore: Int = 0
+var currentScore: Int = 0
+
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var gameStatus = "start";
     let startTitle = SKLabelNode(fontNamed:"Chalkduster")
@@ -22,6 +25,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let bk2 = SKSpriteNode(imageNamed: "angry_background")
     let block = SKSpriteNode(imageNamed: "block_trans")
     var blocks : [SKSpriteNode] = []
+    let scoreNode = SKLabelNode(fontNamed: "Chalkduster")
     
     
     let fabyMask : UInt32 = 0x00
@@ -34,6 +38,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         setTitle("Tap to begin!")
         setupPhysics()
         setupBackground()
+        currentScore = 0
     }
     
     func setupPhysics() {
@@ -144,11 +149,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    func addScoreNode(str: String) {
+        scoreNode.removeFromParent()
+        scoreNode.text = str
+        scoreNode.fontSize = 15
+        scoreNode.fontColor = UIColor.blackColor()
+        scoreNode.position = CGPoint(x:CGRectGetMinX(self.frame) + 40, y:CGRectGetMaxY(self.frame) - 15)
+        self.addChild(scoreNode)
+    }
+    
+    func didBeginContact(contact: SKPhysicsContact) {
+        faby.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
+        sparks.removeFromParent()
+        
+        if scrollNode.speed > 0 {
+            let trans = SKTransition.revealWithDirection(SKTransitionDirection.Down, duration: 0.5)
+            let gameOverScene = GameOverScene(fileNamed: "GameOverScene")
+            gameOverScene.scaleMode = SKSceneScaleMode.AspectFill
+            view!.presentScene(gameOverScene, transition: trans)
+        }
+    }
+    
     func setupBlocks() {
         //add blocks
         let addBlocks = createBlock()
         let delay = SKAction.waitForDuration(0.75, withRange: 0.1)
-        let seq = SKAction.sequence([addBlocks, delay])
+        let incScore = incrementScore()
+        let seq = SKAction.sequence([addBlocks, delay, incScore])
         let addBlocksForever = SKAction.repeatActionForever(seq)
 
         runAction(addBlocksForever, withKey: "addBlocksForever")
@@ -167,6 +194,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         )
     }
     
+    func incrementScore() -> SKAction {
+        return SKAction.sequence([SKAction.runBlock {
+                currentScore = currentScore + 1
+                self.addScoreNode("Score: \(currentScore)")
+        }])
+    }
+    
     func createBlock() -> SKAction {
         return SKAction.sequence(
             [
@@ -178,7 +212,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     let yPos = Float(CGRectGetMaxY(self.frame)) * self.getRandomHeight()
                     aBlock.position = CGPoint(x: CGRectGetMaxX(self.frame) - 10, y: CGFloat(yPos))
                     
-                    let blockPhysicsBody = SKPhysicsBody(circleOfRadius: aBlock.size.width)
+                    let blockPhysicsBody = SKPhysicsBody(circleOfRadius: aBlock.size.width/2.0)
                     blockPhysicsBody.affectedByGravity = false
                     blockPhysicsBody.linearDamping = 1
                     
@@ -215,20 +249,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sparks.removeFromParent()
     }
     
-    func didBeginContact(contact: SKPhysicsContact) {
-        faby.physicsBody?.velocity = CGVector(dx: 0, dy: 0)
-        sparks.removeFromParent()
-        
-        if scrollNode.speed > 0 {
-            self.removeActionForKey("addBlocksForever")
-            gameStatus = "lost"
-            scrollNode.speed = 0
-            for block in blocks {
-                block.removeFromParent()
-            }
-            setTitle("Game Over!")
-        }
-    }
     
     func setTitle(str : String) {
         startTitle.text = str
